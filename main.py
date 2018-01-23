@@ -8,7 +8,7 @@ import sys
 import asyncio
 
 description = "LoL, bot!"
-file_loc = "/home/gector/lolbot"
+file_loc = "/home/gector/lolbot/"
 token_file="/home/gector/discord_bot_token.txt"
 token = ""
 with open(token_file, 'r') as file:
