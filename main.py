@@ -9,6 +9,12 @@ import asyncio
 
 description = "LoL, bot!"
 file_loc = "/home/gector/lolbot"
+token_file="/home/gector/discord_bot_token.txt"
+token = ""
+with open(token_file, 'r') as file:
+    token = file.readline(100).strip()
+print("Bot token: " + token)
+
 bot = discord.Client() # commands.Bot(command_prefix='?', description=description)
 
 @bot.event
@@ -41,4 +47,4 @@ async def on_message(message):
         await bot.send_message(message.channel, "AHHHhh!")
         sys.exit()
 
-bot.run('Mzc4NDYwNjgzNTg0NTM2NTc2.DOb0kw.9u5qaEx9sWVMAgyYtcGzKfrGI0s')
+bot.run(token)
