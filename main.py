@@ -3,6 +3,7 @@
 
 # This is a discord bot to count how many times people say lol
 import discord
+import traceback
 from discord.ext import commands
 import random
 import sys
@@ -43,11 +44,19 @@ async def on_ready():
     print("Connected!")
     print("Username: " + bot.user.name)
     print('------------------')
+@bot.event
+async def on_error(event, *args, **kwargs):
+    await bot.send_message(bot.get_channel("289957526882222080"), "ERROR: FROM: {}, message: {}".format(event, traceback.format_exc()))
+    print("error.")
+    #print("ERROR: FROM: {}, message: {}".format(event, sys.exc_info()))
 
+    #discord.on_error(event, *args, **kwargs)
 @bot.event
 async def on_message(message): # Basis for most of the bot functions
     data = 0; # Filled later
-
+    
+    if message.author.bot:
+        return
     ### ---- Commands {{{{ ---- ###
     if message.content.lower().find("lolcheck") != -1:
         with open(file_loc + "count.txt") as file:
@@ -61,17 +70,19 @@ async def on_message(message): # Basis for most of the bot functions
         raise SystemExit(0)
 
     if message.content.lower().find("lolscore") != -1:
-        with open('data.json') as json_data:
+        with open(file_loc+'data.json') as json_data:
             data = json.load(json_data)
         await bot.send_message(message.channel, message.author.name + ": " + 
                 str(data[message.author.name.lower()]))
 
     if message.content.lower().find("lolboard") != -1:
-        with open('data.json') as json_data:
+        with open(file_loc+'data.json') as json_data:
             data = json.load(json_data)
+        fill_me = ""
         for usr in message.server.members:
             if usr.name.lower() in data and data[usr.name.lower()] != 0:
-                await bot.send_message(message.channel, usr.name + ": " + str(data[usr.name.lower()]))
+                fill_me += usr.name + ": " + str(data[usr.name.lower()]) + "\n"
+        await bot.send_message(message.channel, fill_me)#bot.send_message(message.channel, usr.name + ": " + str(data[usr.name.lower()]))
 
     if message.content.lower().find("lolremove") != -1 and message.author.name.lower().find("gector") != -1:
         msg_args = message.content.split(" ");
@@ -97,7 +108,8 @@ async def on_message(message): # Basis for most of the bot functions
     
     ### --- }}}} end commands --- ###
 
-
+    if message.content == "die123":
+        raise ValueError('err...')
     if message.content.lower().find("lol") != -1 and message.author.name != bot.user.name:
         print("Got lol")
 	
@@ -107,7 +119,7 @@ async def on_message(message): # Basis for most of the bot functions
                 return;
         
         # JSON WIP
-        with open('data.json') as json_data:
+        with open(file_loc+'data.json') as json_data:
              data = json.load(json_data)
              print(data)
 
@@ -117,8 +129,8 @@ async def on_message(message): # Basis for most of the bot functions
         
         data[message.author.name.lower()] += 1
 
-        with open('data.json', 'w') as outfile:
-            json.dump(data, outfile)
+        with open(file_loc+'data.json', 'w') as outfile:
+            json.dump(data, outfile, indent=4)
             
         if random.randint(1, 30) == 15:
             with open(file_loc + "count.txt") as file:
@@ -129,9 +141,10 @@ async def on_message(message): # Basis for most of the bot functions
         data = {0, 1}
         with open(file_loc + "count.txt") as file:
             data = file.readline(99999).strip()
-        with open(file_loc + "count.txt", "w") as file:
+
             print(data)
             data = int(data) + 1
+        with open(file_loc + "count.txt", 'w') as file:
             file.write(str(data))
             if message.content.lower().find(x) == -1:
                 return;
